@@ -10,7 +10,7 @@ const connectDB = require('./config/db');
 
 //load env vars
 
-dotenv.config({ path: './config/config.env' });
+dotenv.config();
 
 //Connect to database
 
