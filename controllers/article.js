@@ -46,3 +46,23 @@ exports.createAtricle = asyncHandler(async (req, res, next) => {
   const article = await Article.create(req.body);
   res.status(200).json({ success: true, data: article });
 });
+
+exports.updateAtricle = asyncHandler(async (req, res, next) => {
+  const { articleId } = req.params;
+  // //Add user to req.body
+  // req.body.user = req.user.id;
+  // //Check for published atricle
+  // const publishedArticle = await Article.findOne({ user: req.user.id });
+  // //if user is not an admin , they can add one bootcamp
+  // if (publishedArticle && req.user.role !== 'admin') {
+  //   return next(
+  //     new ErrorResponse(
+  //       `The user with id ${req.user.id} has already publish bootcamp`,
+  //       400
+  //     )
+  //   );
+  // }
+  const article = await Article.findByIdAndUpdate(articleId, {$set: req.body}, { new: true});
+  res.status(200).json({ success: true, data: article });
+});
+
