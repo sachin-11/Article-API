@@ -35,8 +35,8 @@ const PORT = process.env.PORT || 5000;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //mount routes
-app.use('/api/v1/auth', auth);
-app.use('/api/v1/article', article);
+app.use('/auth', auth);
+app.use('/article', article);
 
 const server = app.listen(PORT, () => {
   console.log(
