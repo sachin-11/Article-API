@@ -34,6 +34,10 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.get('/demo', (req, res) => {
+  res.send('this is demo API for testing')
+})
+
 //mount routes
 app.use('/auth', auth);
 app.use('/article', article);
