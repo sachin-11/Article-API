@@ -5,15 +5,14 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
-env: 
-   MONGO_URI: ${{ secrets.MONGO_URI }}
-   JWT_SECRET: ${{ secrets.JWT_SECRET }}
-   JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
-   NODE_ENV: ${{ secrets.NODE_ENV }}
+    branches: ["master"]
+env:
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+  NODE_ENV: ${{ secrets.NODE_ENV }}
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
@@ -22,53 +21,52 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: pm2 restart server.js
-  deploy-app:
-    runs-on: self-hosted
-    needs: deploy-infra
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set IP Github env from deploy-infra to deploy-app AWS
-        run: echo SERVER_PUBLIC_IP=${{ needs.deploy-infra.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
-      - name: Login to AWS ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-      - name: Build and push Docker Image
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: sachin-node-app
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-        working-directory: ./nodeapp
-      - name: Pull and Deploy Docker Image to EC2
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: sachin-node-app
-          IMAGE_TAG: ${{ github.sha }}
-          AWS_DEFAULT_REGION: us-east-1
-        uses: appleboy/ssh-action@v0.1.7
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          host: ${{ env.SERVER_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ env.PRIVATE_SSH_KEY }}
-          envs: PRIVATE_SSH_KEY,REGISTRY,REPOSITORY,IMAGE_TAG,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_DEFAULT_REGION,AWS_REGION
-          script: |
-            sudo apt update
-            sudo apt install docker.io -y
-            sudo apt install awscli -y
-            sudo $(aws ecr get-login --no-include-email --region ap-south-1)
-            sudo docker stop sachinappcontainer || true
-            sudo docker rm sachinappcontainer || true
-            sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
-            sudo docker run -d --name sachinappcontainer -p 80:8080 $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: pm2 restart server.js
+  deploy-app:
+  runs-on: self-hosted
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set IP Github env from deploy-infra to deploy-app AWS
+      run: echo SERVER_PUBLIC_IP=${{ needs.deploy-infra.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
+    - name: Login to AWS ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Build and push Docker Image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: sachin-node-app
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+      working-directory: ./nodeapp
+    - name: Pull and Deploy Docker Image to EC2
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: sachin-node-app
+        IMAGE_TAG: ${{ github.sha }}
+        AWS_DEFAULT_REGION: us-east-1
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ env.SERVER_PUBLIC_IP }}
+        username: ubuntu
+        key: ${{ env.PRIVATE_SSH_KEY }}
+        envs: PRIVATE_SSH_KEY,REGISTRY,REPOSITORY,IMAGE_TAG,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_DEFAULT_REGION,AWS_REGION
+        script: |
+          sudo apt update
+          sudo apt install docker.io -y
+          sudo apt install awscli -y
+          sudo $(aws ecr get-login --no-include-email --region ap-south-1)
+          sudo docker stop sachinappcontainer || true
+          sudo docker rm sachinappcontainer || true
+          sudo docker pull $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          sudo docker run -d --name sachinappcontainer -p 80:8080 $REGISTRY/$REPOSITORY:$IMAGE_TAG
