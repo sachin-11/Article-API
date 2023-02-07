@@ -8,12 +8,9 @@ on:
     branches: [ "master" ]
 env: 
    MONGO_URI: ${{ secrets.MONGO_URI }}
-  #  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET_KEY }}
-  #  TF_STATE_BUCKET_NAME: ${{ secrets.AWS_TF_BUCKET_NAME }}
-  #  PRIVATE_SSH_KEY: ${{secrets.AWS_SSH_KEY_PRIVATE}}
-  #  PUBLIC_SSH_KEY: ${{secrets.AWS_SSH_KEY_PUBLIC}}
-  #  AWS_REGION: us-east-1    
-
+   JWT_SECRET: ${{ secrets.JWT_SECRET }}
+   JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+   NODE_ENV: ${{ secrets.NODE_ENV }}
 jobs:
   build:
 
