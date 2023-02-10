@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/demo', (req, res) => {
