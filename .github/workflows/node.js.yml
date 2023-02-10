@@ -10,7 +10,7 @@ env:
   NODE_ENV: ${{ secrets.NODE_ENV }}
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       matrix:
@@ -25,3 +25,4 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run build --if-present
+      - run: pm2 restart server.js
