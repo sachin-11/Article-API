@@ -15,6 +15,7 @@ dotenv.config();
 //Connect to database
 
 connectDB();
+
 //mount routes
 const auth = require('./routes/auth');
 const article = require('./routes/article');
