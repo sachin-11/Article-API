@@ -35,7 +35,7 @@ const PORT = process.env.PORT || 3000;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/demo', (req, res) => {
-  res.send('this is demo API for testing for serverless deployment')
+  res.send('this is demo API for testing for serverless deployment...')
 })
 
 //mount routes
