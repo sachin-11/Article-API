@@ -35,7 +35,7 @@ const PORT = process.env.PORT || 3000;
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/demo', (req, res) => {
-  res.send('this is demo API for testing and again for testing this is cd deployment')
+  res.send('this is demo API for testing for serverless deployument')
 })
 
 //mount routes
@@ -54,3 +54,4 @@ process.on('unhandledRejection', (err, promise) => {
   //close server
   server.close(() => process.exit(1));
 });
+module.exports = server;
